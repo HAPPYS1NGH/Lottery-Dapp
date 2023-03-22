@@ -37,6 +37,7 @@ const findMetaMaskAccount = async () => {
 
 function App() {
   const [currentAccount, setCurrentAccount] = useState("");
+  const [random, setRandom] = useState("");
   const contractABI = abi.abi;
   const contractAddress = "0xaC34aC2600be403426E9Bd6DE9b895bFbbDF8391";
   const connectWallet = async () => {
@@ -65,6 +66,23 @@ function App() {
     });
   }, [currentAccount]);
 
+  const sendMoney = async ()=>{
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const LotteryContract = new ethers.Contract(contractAddress, contractABI, signer);
+        let randomNo = await LotteryContract.random();
+        console.log(randomNo.toString());
+        setRandom(randomNo.toString());
+      }}
+       catch (error) {
+        console.log(error);
+      }
+    }
+
   return (
     <div className="App">
       <div>Hello </div>
@@ -73,6 +91,11 @@ function App() {
             Connect Wallet
           </button>
         )}
+        <div>
+        <button className="send" onClick={sendMoney}>
+            Get random Number {random ? random : 0}
+          </button>
+        </div>
     </div>
   );
 }
