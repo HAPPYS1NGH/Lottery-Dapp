@@ -38,6 +38,8 @@ const findMetaMaskAccount = async () => {
 function App() {
   const [currentAccount, setCurrentAccount] = useState("");
   const [random, setRandom] = useState("");
+  const [participants , setParticipants] = useState([]);
+
   const contractABI = abi.abi;
   const contractAddress = "0xaC34aC2600be403426E9Bd6DE9b895bFbbDF8391";
   const connectWallet = async () => {
@@ -83,6 +85,44 @@ function App() {
       }
     }
 
+    const getParticipants = async ()=>{
+      try {
+        const { ethereum } = window;
+  
+        if (ethereum) {
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          const LotteryContract = new ethers.Contract(contractAddress, contractABI, signer);
+          let participants = await LotteryContract.participants(0);
+          console.log(participants);
+        }}
+         catch (error) {
+          console.log(error);
+        }
+    }
+
+    const takePartInLottery = async () => {
+      try {
+        const { ethereum } = window;
+    
+        if (ethereum) {
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          const LotteryContract = new ethers.Contract(contractAddress, contractABI, signer);
+          const amountToSend = ethers.utils.parseEther('0.1');
+          const transaction = await signer.sendTransaction({
+            to: LotteryContract.address,
+            value: amountToSend
+          })
+          await transaction.wait();
+          console.log(`Transaction hash: ${transaction.hash}`);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    
+
   return (
     <div className="App">
       <div>Hello </div>
@@ -96,6 +136,8 @@ function App() {
             Get random Number {random ? random : 0}
           </button>
         </div>
+        <div><button onClick={getParticipants} >Get Participants</button></div>
+        <div><button onClick={takePartInLottery} >Take Part in Lottery</button></div>
     </div>
   );
 }
